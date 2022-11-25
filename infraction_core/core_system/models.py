@@ -187,17 +187,20 @@ class Logs(models.Model):
 
 class Personas(models.Model):
     id_persona = models.AutoField(primary_key=True)
+    documento = models.CharField(max_length=20)
     tipo_documento = models.CharField(max_length=4)
     tipo_persona = models.CharField(max_length=16)
+    nombres = models.CharField(max_length=100, blank=True, null=True)
+    apellidos = models.CharField(max_length=100, blank=True, null=True)
     email = models.CharField(max_length=100, blank=True, null=True)
     movil = models.CharField(max_length=13, blank=True, null=True)
     fecha_consulta_comp = models.DateTimeField(blank=True, null=True)
     consulta_recurrente = models.IntegerField(blank=True, null=True)
-    documento = models.CharField(max_length=20)
 
     class Meta:
         managed = False
         db_table = 'personas'
+
 
 
 class SalariosMensuales(models.Model):
@@ -220,3 +223,21 @@ class Sanciones(models.Model):
         managed = False
         db_table = 'sanciones'
 
+
+class Tokens(models.Model):
+    id_token = models.AutoField(primary_key=True)
+    token_key = models.CharField(max_length=800)
+
+    class Meta:
+        managed = False
+        db_table = 'tokens'
+
+
+class Parametrizaciones(models.Model):
+    id_codigo = models.AutoField(primary_key=True)
+    clave = models.CharField(unique=True, max_length=20)
+    valor = models.CharField(max_length=20)
+
+    class Meta:
+        managed = False
+        db_table = 'parametrizaciones'

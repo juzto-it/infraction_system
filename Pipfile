@@ -13,8 +13,10 @@ jsonschema = "*"
 pytz = "*"
 requests = "*"
 gunicorn = "==20.0.4"
+aiohttp = "*"
 
 [dev-packages]
+autopep8 = "*"
 
 [requires]
 python_version = "3.8"
