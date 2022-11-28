@@ -18,6 +18,7 @@ class Fotomultas(APIView):
     
     def post(self, request):
         _data = request.data
+        queryset = Comparendos.objects.all()
         serializer_class = ComparendosSerializer
         try:
             customer = BasicProfile(_data['origin'], _data['doc_number'], _data['doc_type'], _data['person_type'])

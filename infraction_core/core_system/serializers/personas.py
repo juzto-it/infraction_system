@@ -56,4 +56,6 @@ class PersonasSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comparendos
+        fields = ('documento' , 'tipo_documento', 'tipo_persona', 'nombres', 'apellidos', 'email', 'movil', 'fecha_consulta_comp', 
+        'consulta_recurrente')
 
