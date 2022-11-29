@@ -1,5 +1,8 @@
+from .schemas import *
+from .models import Comparendos, Personas
 from django.core.exceptions import ObjectDoesNotExist
 from asgiref.sync import sync_to_async
+from utils.tools import IUtility
 from .ifc_verifik import IVerifik
 from .profiles import Profile
 from .models import Tokens
@@ -13,18 +16,20 @@ class ComparendoVerifik(IVerifik):
         self.__endpoints = ['https://api.verifik.co/v2/co/simit/consultarComparendos', 
                            'https://api.verifik.co/v2/co/simit/consultarResoluciones']
         self._infractions = list()
+        self.__customer = None
+        self.__comparendos_obj = {'comparendos': list(), 'resoluciones': list()}
         
-    async def get_infractions(self, customer: Profile) -> list:
+    async def get_infractions(self, customer: Profile) -> dict:
         
         verifik_resp = list()
         actions = list()
-        
+        self.__customer = customer
         try:
             token = await self.__get_connection()
             if token is not None:
                 
                 hds = {'Authorization': token, 'Content-Type': 'application/json'} 
-                _data = {'documentNumber':customer._doc_number, 'documentType': customer._doc_type}
+                _data = {'documentNumber':self.__customer._doc_number, 'documentType': self.__customer._doc_type}
                 
                 async with aiohttp.ClientSession(headers=hds) as session:
                     for endpoint in self.__endpoints:
@@ -33,28 +38,126 @@ class ComparendoVerifik(IVerifik):
                     response_data = await asyncio.gather(*actions)
                     for data in response_data:
                         verifik_resp.append(data)
-
+                        
+                    self.__transform_data(verifik_resp)
                 
+                return self.__comparendos_obj, None    
         except Exception as _e:
             print(_e)
-            pass
+            return self.__comparendos_obj, str(_e)
             
-        return ['Infractions from the comparendo verifik']
+        
     
-    def _save_infractions(self) -> bool:
-        pass
+    def _save_infractions(self, customer: Personas) -> dict:
+        try:
+            person = Personas.objects.filter(documento='3333333', 
+                                             tipo_documento='CC')
+            
+                
+            
+        except Exception as _e:
+            print(_e)
+            return None
     
     def __transform_data(self, infractions):
-        try:
-            pass
-        except:
-            pass
-            
-    async def __get_data(self, session: aiohttp.ClientSession, url: str, params: dict):
         
+        self.__comparendos_obj = {'comparendos': list(), 'resoluciones': list()}
+
+        try:
+            for element in infractions:
+                try:
+                    if element['api'] == 'comparendos':
+                        
+                        
+                        val_schema = IUtility().schema_validator(schema_comparendos, element['d'])
+                        if val_schema:
+                            if isinstance(element['d']['data']['comparendos'], list):
+                                comparendos = element['d']['data']['comparendos']
+                            else:
+                                comparendos = [element['d']['data']['comparendos']]
+                            
+                            for cmp in comparendos:
+                                
+                                _map = {
+   
+                                     'id_comparendo': cmp['numeroComparendo'],
+                                     'infraccion': cmp['codigoInfraccion'],
+                                     'id_persona': None,
+                                     'fotodeteccion': True if cmp['codigoInfraccion'] == 'S' else False,
+                                     'estado': 'Comparendo',
+                                     'fecha_imposicion': IUtility().format_date_verifik(cmp['fechaComparendo']),
+                                     'fecha_resolucion': None,
+                                     'fecha_cobro_coactivo': None,
+                                     'numero_resolucion': None,
+                                     'numero_cobro_coactivo': None,
+                                     'placa': cmp['placaVehiculo'],
+                                     'servicio_vehiculo': cmp['servicioVehiculo'],
+                                     'tipo_vehiculo': cmp['tipoVehiculo'],
+                                     'secretaria': cmp['secretariaComparendo'],
+                                     'direccion': cmp['direccionComparendo'],
+                                     'valor_neto': None,
+                                     'valor_pago': cmp['total'],
+                                }
+                                self.__comparendos_obj['comparendos'].append(_map)
+                        else:
+                            pass
+                            # report log de respuesta inconsistente    
+                            
+                    elif element['api'] == 'resoluciones':
+                        
+                        val_schema = IUtility().schema_validator(schema_resoluciones, element['d'])
+                        if val_schema:
+                            if isinstance(element['d']['data']['resoluciones'], list):
+                                resoluciones = element['d']['data']['resoluciones']
+                            else:
+                                resoluciones = [element['d']['data']['resoluciones']]
+                            
+                            for res in resoluciones:
+                                
+                                _map = {
+   
+                                     'id_comparendo': res['numeroComparendo'],
+                                     'infraccion': None,
+                                     'id_persona': None,
+                                     'fotodeteccion': None,
+                                     'estado': 'Cobro' if res['estadosResoluciones'] == 'Cobro coactivo' else 'Resolución',
+                                     'fecha_imposicion': IUtility().format_date_verifik(res['fechaComparendo']),
+                                     'fecha_resolucion': IUtility().format_date_verifik(res['fechaResolucion']),
+                                     'fecha_cobro_coactivo': None,
+                                     'numero_resolucion': res['resoluciones'],
+                                     'numero_cobro_coactivo': None,
+                                     'placa': None,
+                                     'servicio_vehiculo': None,
+                                     'tipo_vehiculo': None,
+                                     'secretaria': res['secretarias'],
+                                     'direccion': None,
+                                     'valor_neto': None,
+                                     'valor_pago': res['total'],
+                                }
+                                self.__comparendos_obj['resoluciones'].append(_map)
+                        else:
+                            pass
+                          
+                except Exception as _e:
+                    # report log de excepción en tranform data
+                    print(_e)        
+        
+        except Exception as _e:
+            # report log de excepción loop response data from verifik
+            pass
+      
+    async def __get_data(self, session: aiohttp.ClientSession, url: str, params: dict) -> dict:
+        
+        api = None
         async with session.get(url=url, params=params) as resp:
             data = await resp.json()
-            return data
+            
+            if 'Comparendos' in url:
+                api = 'comparendos'
+            elif 'Resoluciones':
+                api = 'resoluciones'
+            
+            return {'api': api, 'd': data}
         
     async def __get_connection(self) -> str:
         

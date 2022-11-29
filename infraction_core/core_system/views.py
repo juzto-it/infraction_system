@@ -17,6 +17,12 @@ class Fotomultas(APIView):
         
         _data = request.data
         
+        object_response = {
+            'data': list(),
+            'status': None,
+            'error': None,
+        }
+        err = None
         # Aquí va un serializador
         try:
             customer = BasicProfile(_data['origin'], _data['doc_number'], _data['doc_type'], _data['person_type'])
@@ -25,12 +31,15 @@ class Fotomultas(APIView):
             if _data['mobile']: customer._mobile = _data['mobile']
             
             infractions = InfractionController(customer)
-            infractions._fetch_data_infractions()
+            data_infractions, err = infractions._fetch_data_infractions()
+           
+            object_response['data'] = data_infractions
+            object_response['status'] = 'success'
             
-        except Exception as _customer_except:
-            print(_customer_except)
-        
-        
-
-        
-        return Response(status=status.HTTP_200_OK, data={'hola': 'saludo'}) 
+        except Exception as _except:
+            
+            object_response['status'] = 'error'
+            object_response['error'] = err if err else str(_except)
+            print(_except)
+         
+        return Response(status=status.HTTP_200_OK, data=object_response) 
