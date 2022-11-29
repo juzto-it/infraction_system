@@ -1,6 +1,28 @@
 from django.db import models
 
 
+## CHOICES
+ESTADO = (
+    ('1','Comparendo'), ('2','Resolución'), ('3','Cobro'), ('4','Archivado')
+)
+
+SERVICIO_VEHICULO = (
+    ('1','Particular'), ('2','Oficial'), ('3','Otros'), ('4','Publico'), ('5','No reportado'), ('6','Diplomatico')
+)
+
+TIPO_VEHICULO = (
+    ('1','AUTOMOVIL'), ('2','MOTOCICLETA'), ('3','CAMION'), ('4','CAMIONETA'), ('5','BUSETA'), ('6','MICROBUS'), ('7','DESCONOCIDA'), ('8','CAMPERO'), ('9','TRACTO/CAMION')
+)
+
+ORIGEN = (
+    ('1','CRM'), ('2','Juzto.co'), ('1','Webhook externo')
+)
+
+DESTINO = (
+    ('1','Verifik'), ('2','Bot SIMIT'), ('3','Bot Bogotá'), ('4','Bot Medellín')
+)
+
+
 class AuthGroup(models.Model):
     name = models.CharField(unique=True, max_length=150)
 
@@ -94,15 +116,15 @@ class Comparendos(models.Model):
     infraccion = models.ForeignKey('Infracciones', models.DO_NOTHING, db_column='infraccion', blank=True, null=True)
     id_persona = models.ForeignKey('Personas', models.DO_NOTHING, db_column='id_persona', blank=True, null=True)
     fotodeteccion = models.IntegerField(blank=True, null=True)
-    estado = models.CharField(max_length=11, blank=True, null=True)
+    estado = models.CharField(max_length=11,choices=ESTADO, blank=True, null=True)
     fecha_imposicion = models.DateField(blank=True, null=True)
     fecha_resolucion = models.DateField(blank=True, null=True)
     fecha_cobro_coactivo = models.DateField(blank=True, null=True)
     numero_resolucion = models.CharField(max_length=30, blank=True, null=True)
     numero_cobro_coactivo = models.CharField(max_length=30, blank=True, null=True)
     placa = models.CharField(max_length=6, blank=True, null=True)
-    servicio_vehiculo = models.CharField(max_length=12, blank=True, null=True)
-    tipo_vehiculo = models.CharField(max_length=13, blank=True, null=True)
+    servicio_vehiculo = models.CharField(max_length=12, choices=SERVICIO_VEHICULO, blank=True, null=True)
+    tipo_vehiculo = models.CharField(max_length=13, choices=TIPO_VEHICULO, blank=True, null=True)
     secretaria = models.CharField(max_length=100, blank=True, null=True)
     direccion = models.CharField(max_length=120, blank=True, null=True)
     valor_neto = models.FloatField(blank=True, null=True)
@@ -174,8 +196,8 @@ class Infracciones(models.Model):
 class Logs(models.Model):
     id_log = models.OneToOneField(CodigosConsulta, models.DO_NOTHING, db_column='id_log', primary_key=True)
     fecha = models.DateTimeField()
-    origen = models.CharField(max_length=15)
-    destino = models.CharField(max_length=12)
+    origen = models.CharField(max_length=15,choices=ORIGEN)
+    destino = models.CharField(max_length=12,choices=DESTINO)
     usuario = models.ForeignKey('Personas', models.DO_NOTHING, db_column='usuario', blank=True, null=True)
     resultado = models.IntegerField()
 

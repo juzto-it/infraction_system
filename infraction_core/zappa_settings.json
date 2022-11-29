@@ -1,0 +1,14 @@
+{
+    "dev": {
+        "aws_region": "us-east-1",
+        "django_settings": "infraction_core.settings",
+        "profile_name": "default",
+        "project_name": "infraction-core",
+        "runtime": "python3.9",
+        "s3_bucket": "zappa-jwdev8zmj",
+        "vpc_config" : {
+            "SubnetIds": [ "subnet-564fed1b", "subnet-9c8c95b2", "subnet-32617355", "subnet-e0f9e6bc", "subnet-53ea3e5d", "subnet-bab49284" ], 
+            "SecurityGroupIds": [ "sg-99a3f3b0" ]
+        }
+    }
+}
