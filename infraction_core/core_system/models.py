@@ -1,5 +1,7 @@
 from django.db import models
 
+
+## CHOICES
 ESTADO = (
     ('1','Comparendo'), ('2','Resolución'), ('3','Cobro'), ('4','Archivado')
 )
@@ -9,7 +11,15 @@ SERVICIO_VEHICULO = (
 )
 
 TIPO_VEHICULO = (
-    ('1','AUTOMOVIL'), ('2','MOTOCICLETA'), ('3','CAMION'), ('4','CAMIONETA'), ('5','BUSETA'), ('6','MICROBUS'), ('7','DESCONOCIDA'), ('8','CAMPERO'), ('9','TRACTO/CAMION'),
+    ('1','AUTOMOVIL'), ('2','MOTOCICLETA'), ('3','CAMION'), ('4','CAMIONETA'), ('5','BUSETA'), ('6','MICROBUS'), ('7','DESCONOCIDA'), ('8','CAMPERO'), ('9','TRACTO/CAMION')
+)
+
+ORIGEN = (
+    ('1','CRM'), ('2','Juzto.co'), ('1','Webhook externo')
+)
+
+DESTINO = (
+    ('1','Verifik'), ('2','Bot SIMIT'), ('3','Bot Bogotá'), ('4','Bot Medellín')
 )
 
 
@@ -186,8 +196,8 @@ class Infracciones(models.Model):
 class Logs(models.Model):
     id_log = models.OneToOneField(CodigosConsulta, models.DO_NOTHING, db_column='id_log', primary_key=True)
     fecha = models.DateTimeField()
-    origen = models.CharField(max_length=15)
-    destino = models.CharField(max_length=12)
+    origen = models.CharField(max_length=15,choices=ORIGEN)
+    destino = models.CharField(max_length=12,choices=DESTINO)
     usuario = models.ForeignKey('Personas', models.DO_NOTHING, db_column='usuario', blank=True, null=True)
     resultado = models.IntegerField()
 

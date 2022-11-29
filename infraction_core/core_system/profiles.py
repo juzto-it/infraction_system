@@ -6,7 +6,7 @@ class Profile:
         self._origin = origin
         self._doc_number = doc_number
         self._doc_type = doc_type
-        self._person_typ = person_type
+        self._person_type = person_type
         
     def __str__(self) -> str:
         return self._doc_type + ' ' + self._doc_number

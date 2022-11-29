@@ -90,3 +90,5 @@ class ComparendosSerializer(serializers.ModelSerializer):
         fields = ('infraccion' , 'id_persona', 'fotodeteccion', 'estado', 'fecha_imposicion', 'fecha_resolucion', 'fecha_cobro_coactivo', 'numero_resolucion', 
         'numero_cobro_coactivo', 'placa', 'servicio_vehiculo', 'tipo_vehiculo', 'secretaria', 'direccion', 'valor_neto', 'valor_pago')
 
+
+
