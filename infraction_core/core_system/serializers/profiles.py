@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
+from includes.validator import IS_NUMBERVALIDATOR, IS_EMAIL
+from django.core.validators import MinLengthValidator, EmailValidator
 
 ## MODELOS ##
 from core_system.models import Comparendos, Sanciones, Personas, Infracciones
@@ -11,22 +13,30 @@ class BasicProfileSerializer(serializers.Serializer):
     '''
     origin = serializers.CharField(
         label='Origen',
-        max_length=20
+        max_length=20,
+        allow_blank=False,
+        allow_null=False
     )
 
     doc_number = serializers.CharField(
         label='Documento',
-        max_length=20
+        max_length=20,
+        allow_blank=False,
+        allow_null=False
     )
 
     doc_type = serializers.CharField(
         label='Tipo documento',
-        max_length=4
+        max_length=4,
+        allow_blank=False,
+        allow_null=False
     )
 
     person_type = serializers.CharField(
         label='Tipo persona',
-        max_length=16
+        max_length=16,
+        allow_blank=False,
+        allow_null=False
     )
 
     first_name = serializers.CharField(
@@ -41,12 +51,18 @@ class BasicProfileSerializer(serializers.Serializer):
 
     email = serializers.CharField(
         label='Email',
-        max_length=100
+        max_length=100,
+        validators=[
+            EmailValidator()
+        ],
     )
 
     mobile = serializers.CharField(
         label='Movil',
-        max_length=13
+        validators=[
+            IS_NUMBERVALIDATOR,
+            MinLengthValidator(7)
+        ],
     )
 
     update = serializers.BooleanField(
@@ -54,15 +70,10 @@ class BasicProfileSerializer(serializers.Serializer):
     )
 
     def create(self, validated_data):
-        person = Personas.objects.filter(tipo_documento = validated_data['doc_type'], documento = validated_data['doc_number']).first()
-        if person:
-            raise serializers.ValidationError({'detail':'El usuario ya ha sido registrado'})
-        return super().create(validated_data)
-
-
+        Personas.objects.get_or_create(validated_data)
+    
     def update(self, validated_data):
         update = self._kwargs['data'].get('update')
-        if update == 1:
-            instance = Personas.objects.filter(tipo_documento = validated_data['doc_type'], documento = validated_data['doc_number']).first()   
-            return super().update(instance, validated_data)
+        if update == 1: 
+            Personas.objects.update_or_create(validated_data)
 
