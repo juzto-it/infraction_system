@@ -22,6 +22,14 @@ DESTINO = (
     ('1','Verifik'), ('2','Bot SIMIT'), ('3','Bot Bogotá'), ('4','Bot Medellín')
 )
 
+TIPO_PERSONA = (
+    ('Persona natural','Persona natural'), ('Persona jurídica','Persona jurídica')
+)
+
+TIPO_DOCUMENTO = (
+    ('CC','CC'), ('TI','TI'), ('CE','CE'), ('RC','RC'), ('NIP','NIP'), ('NUIP','NUIP'), ('NIT','NIT'), ('PA','PA')
+)
+
 
 class AuthGroup(models.Model):
     name = models.CharField(unique=True, max_length=150)
@@ -210,8 +218,8 @@ class Logs(models.Model):
 class Personas(models.Model):
     id_persona = models.AutoField(primary_key=True)
     documento = models.CharField(max_length=20)
-    tipo_documento = models.CharField(max_length=4)
-    tipo_persona = models.CharField(max_length=16)
+    tipo_documento = models.CharField(max_length=4,choices=TIPO_DOCUMENTO)
+    tipo_persona = models.CharField(max_length=16,choices=TIPO_PERSONA)
     nombres = models.CharField(max_length=100, blank=True, null=True)
     apellidos = models.CharField(max_length=100, blank=True, null=True)
     email = models.CharField(max_length=100, blank=True, null=True)
