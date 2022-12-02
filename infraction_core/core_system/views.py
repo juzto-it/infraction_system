@@ -17,10 +17,18 @@ class Fotomultas(APIView):
     
     permission_classes = [IsAuthenticated]
     
-    def post(self, request, format=None):
+    def post(self, request):
         _data = request.data
+        
+        object_response = {
+            'data': list(),
+            'status': None,
+            'error': None,
+        }
+        err = None
+        # Aquí va un serializador
         queryset = Comparendos.objects.all()
-        serializer_class = BasicProfileSerializer(_data)
+        serializer_class = BasicProfileSerializer
         try:
             customer = BasicProfile(_data['origin'], _data['doc_number'], _data['doc_type'], _data['person_type'])
             
@@ -28,24 +36,18 @@ class Fotomultas(APIView):
             if _data['mobile']: customer._mobile = _data['mobile']
             
             infractions = InfractionController(customer)
-            infractions._fetch_data_infractions()
-            print('here')
-            
-        except Exception as _customer_except:
-            print(_customer_except)
-               
-        return Response(status=status.HTTP_200_OK, data={'hola': 'saludo'}) 
+            data_infractions, err = infractions._fetch_data_infractions()
 
-class Consultas(APIView):
-    
-    permission_classes = [IsAuthenticated]
-    
-    def post(self, request):
-        serializer = BasicProfileSerializer(data=request.data)
-        print(request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            object_response['data'] = data_infractions
+            object_response['status'] = 'success'
+
+        except Exception as _except:
+
+            object_response['status'] = 'error'
+            object_response['error'] = err if err else str(_except)
+            print(_except)
+
+
    
 
 

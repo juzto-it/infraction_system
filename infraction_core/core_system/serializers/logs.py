@@ -3,7 +3,7 @@ from rest_framework.serializers import ValidationError
 from django.db import transaction
 
 ## MODELOS ##
-from core_system.models import Logs
+from core_system.models import Logs, Comparendos, Sanciones, Personas, Infracciones
 
 
 class PersonasSerializer(serializers.ModelSerializer):

@@ -63,21 +63,6 @@ class BasicProfileSerializer(serializers.Serializer):
     )
 
     def create(self, validated_data):
-        persona = validated_data
-        data_persona = {
-            'documento': persona['doc_number'],
-            'tipo_documento': persona['doc_type'],
-            'tipo_persona': persona['person_type'],
-            'email': persona['email'],
-            'movil': persona['mobile']
-        }
-        print(data_persona)
-        persona_serializer = PersonasSerializer(data=data_persona)
-        if persona_serializer.is_valid():
-            persona_serializer.save()
+        query = Personas.objects.filter(tipo_documento=validated_data['doc_type'],documento=validated_data['doc_number']).first()
+        return query
 
-    
-    def update(self, validated_data):
-        update = self._kwargs['data'].get('update')
-        if update == False: 
-            return Personas.objects.update_or_create(validated_data)
