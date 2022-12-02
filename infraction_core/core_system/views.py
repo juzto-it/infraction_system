@@ -2,13 +2,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from .profiles import BasicProfile
 from .controllers import InfractionController
-from core_system.serializers.comparendos import ComparendosSerializer
-from core_system.serializers.profiles import BasicProfileSerializer
-from core_system.serializers.personas import PersonasSerializer
-from core_system.models import Comparendos
-from rest_framework.decorators import api_view, authentication_classes, permission_classes, action
+from .profiles import BasicProfile 
+from .serializers.profiles import BasicProfileSerializer
+
 
 
 # Create your views here.
@@ -62,23 +59,6 @@ class Fotomultas(APIView):
             print(_except)
 
 
-class Personas(APIView):
-
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request):
-        persona = request.data
-        data_persona={
-            'documento': persona['doc_number'],
-            'tipo_documento': persona['doc_type'],
-            'tipo_persona': persona['person_type'],
-            'email': persona['email'],
-            'movil': persona['mobile']
-        }
-        serializer = PersonasSerializer(data=data_persona)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 

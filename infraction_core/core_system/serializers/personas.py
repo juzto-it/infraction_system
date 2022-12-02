@@ -25,7 +25,6 @@ class PersonasSerializer(serializers.ModelSerializer):
         max_length=16
     )
 
-
     nombres = serializers.CharField(
         label='Nombres',
         max_length=100,

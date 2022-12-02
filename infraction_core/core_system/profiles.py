@@ -1,5 +1,4 @@
 from .models import Personas
-from core_system.serializers.personas import PersonasSerializer
 from utils.tools import IUtility
 
 
@@ -14,7 +13,6 @@ class Profile:
         self._update = False
         self._data_map = dict()
         
-        
     def __str__(self) -> str:
         return self._doc_type + ' ' + self._doc_number
     
@@ -24,18 +22,14 @@ class Profile:
         try:
             #validated_data.pop('origin')
             self.__map_object(validated_data)
-            person_serializer = PersonasSerializer(data=self._data_map)
-            
-            if person_serializer.is_valid():
-                if validated_data.get('_update'):
-                    person = self.__update(self._data_map)
-                    return person
-                else:
-                    person = self.__create(self._data_map)
-                    return person
-            
-            raise Exception(person_serializer.errors)
         
+            if validated_data.get('_update'):
+                person = self.__update(self._data_map)
+                return person
+            else:
+                person = self.__create(self._data_map)
+                return person
+            
         except Exception as err: 
             result = err
         return person    
@@ -53,7 +47,7 @@ class Profile:
         return person
     
     def __update(self, u_data: dict):
-        # updated = self._kwargs['data'].get('update')
+        
         person, _ = Personas.objects.update_or_create(
             documento=u_data.get('documento'), 
             tipo_documento=u_data.get('tipo_documento'),
@@ -83,9 +77,7 @@ class Profile:
         except Exception as err:
             return err
             
-        
-        
-
+            
 class BasicProfile(Profile):
       
     def __init__(self, origin: str, doc_number: str, doc_type: str, person_type: str,
