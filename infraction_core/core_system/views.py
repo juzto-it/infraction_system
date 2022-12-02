@@ -48,6 +48,23 @@ class Fotomultas(APIView):
             print(_except)
 
 
+class Personas(APIView):
+    
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        persona = request.data
+        data_persona={ 
+            'documento': persona['doc_number'],
+            'tipo_documento': persona['doc_type'],
+            'tipo_persona': persona['person_type'],
+            'email': persona['email'],
+            'movil': persona['mobile']
+        }    
+        serializer = PersonasSerializer(data=data_persona)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
    
 
 
