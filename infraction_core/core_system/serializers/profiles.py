@@ -22,16 +22,16 @@ class BasicProfileSerializer(serializers.Serializer):
         allow_null=False
     )
 
-    doc_type = serializers.ChoiceField(
+    doc_type = serializers.CharField(
         label='Tipo documento',
-        choices=['CC','TI','CE','RC','NIP','NUIP','NIT','PA'],
+        max_length=4,
         allow_blank=False,
-        allow_null=False,
+        allow_null=False
     )
 
-    person_type = serializers.ChoiceField(
+    person_type = serializers.CharField(
         label='Tipo persona',
-        choices=['Persona natural', 'Persona jurídica'],
+        max_length=16,
         allow_blank=False,
         allow_null=False
     )

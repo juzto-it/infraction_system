@@ -29,36 +29,42 @@ class PersonasSerializer(serializers.ModelSerializer):
     nombres = serializers.CharField(
         label='Nombres',
         max_length=100,
-        allow_null=True
+        allow_null=True,
+        max_length=100,
+        allow_blank=True,
+        allow_null=True,
+        required = False
     )
 
     apellidos = serializers.CharField(
         label='Apellidos',
         max_length=100,
-        allow_null=True
+        allow_blank=True,
+        allow_null=True,
+        required = False
     )
 
     email = serializers.CharField(
         label='Email',
-        max_length=100,
-        allow_null=True
+        max_length=100
     )
 
     movil = serializers.CharField(
         label='Movil',
-        max_length=13,
+        max_length=14,
         allow_null=True
     )
 
     fecha_consulta_comp = serializers.DateTimeField(
         label='Fecha consulta comparendo',
         allow_null=True,
-        required=False
+        required = False
     )
 
     consulta_recurrente = serializers.BooleanField(
         label='Consulta recurrente',
-        allow_null=True
+        allow_null=True,
+        required = False
     )
 
 
