@@ -29,11 +29,13 @@ class ComparendoVerifik(IVerifik):
             if token is not None:
                 
                 hds = {'Authorization': token, 'Content-Type': 'application/json'} 
-                _data = {'documentNumber':self.__customer._doc_number, 'documentType': self.__customer._doc_type}
+                _data = {'documentNumber':self.__customer._doc_number, 
+                         'documentType': self.__customer._doc_type}
                 
                 async with aiohttp.ClientSession(headers=hds) as session:
                     for endpoint in self.__endpoints:
-                       actions.append(asyncio.ensure_future(self.__get_data(session, endpoint, _data)))
+                       actions.append(asyncio.ensure_future(
+                           self.__get_data(session, endpoint, _data)))
                        
                     response_data = await asyncio.gather(*actions)
                     for data in response_data:
@@ -45,19 +47,35 @@ class ComparendoVerifik(IVerifik):
         except Exception as _e:
             print(_e)
             return self.__comparendos_obj, str(_e)
-            
-        
-    
-    def _save_infractions(self, customer: Personas) -> dict:
-        try:
-            person = Personas.objects.filter(documento='3333333', 
-                                             tipo_documento='CC')
-            
                 
-            
+    def _save_infractions(self, customer: Personas) -> bool:
+        try:
+            saved = False
+            if (isinstance(customer, Personas) and 
+                isinstance(self.__comparendos_obj, dict)):
+                
+                data_api = (self.__comparendos_obj.get('comparendos') + 
+                            self.__comparendos_obj.get('resoluciones'))
+                
+                ids_data_api = [id['id_comparendo'] for id in data_api]
+                data_bd = Comparendos.objects.filter(id_persona=customer.pk) 
+                
+                if len(data_bd) > 0:
+                    data_bd.exclude(id_comparendo__in=ids_data_api).update(estado='Inactivo')
+                               
+                for cmp in data_api:
+                    cmp.update({'id_persona': customer})
+                    Comparendos.objects.update_or_create(id_comparendo=cmp.get('id_comparendo'),
+                                                            defaults=cmp)
+                saved = True            
+            else:
+                raise Exception('Error saving infractions. Customer or comparendos object does not an instance.')
+                           
         except Exception as _e:
+            saved = False
             print(_e)
-            return None
+            # registrar en log la exepción
+        return saved
     
     def __transform_data(self, infractions):
         
@@ -68,8 +86,8 @@ class ComparendoVerifik(IVerifik):
                 try:
                     if element['api'] == 'comparendos':
                         
-                        
-                        val_schema = IUtility().schema_validator(schema_comparendos, element['d'])
+                        val_schema = IUtility().schema_validator(
+                            schema_comparendos, element['d'])
                         if val_schema:
                             if isinstance(element['d']['data']['comparendos'], list):
                                 comparendos = element['d']['data']['comparendos']
@@ -137,6 +155,7 @@ class ComparendoVerifik(IVerifik):
                                 self.__comparendos_obj['resoluciones'].append(_map)
                         else:
                             pass
+                            # report log de respuesta inconsistente    
                           
                 except Exception as _e:
                     # report log de excepción en tranform data
@@ -163,9 +182,10 @@ class ComparendoVerifik(IVerifik):
         
         try:
             rs_token = await Tokens.objects.aget(id_token=1)    
-            return rs_token.token_key 
+            return rs_token.token_key
             
         except ObjectDoesNotExist as e:
             print(e)
+            # Registar log de que el token no existe o no se puede recuperar
             return None
                 

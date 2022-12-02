@@ -1,3 +1,6 @@
+from datetime import datetime, timezone, timedelta, date
+import pytz
+
 class Formatter:
 
     @staticmethod
@@ -15,7 +18,6 @@ class Formatter:
         except Exception as _e:
             return c_date
             
-    
     @staticmethod
     def clean_null_keys(exp: dict) -> dict:
         
@@ -23,3 +25,11 @@ class Formatter:
             return {k:v for k, v in exp.items() if v is not None}
         except:
             return None
+
+    @staticmethod
+    def datetime_utc_now():
+        
+        time_zone = pytz.timezone('America/Bogota')
+        dt = datetime.now(time_zone)
+        dt = dt.strftime('%Y-%m-%d %H:%M:%S')
+        return str(dt)

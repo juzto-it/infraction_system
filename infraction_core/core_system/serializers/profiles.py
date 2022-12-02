@@ -3,9 +3,6 @@ from rest_framework.serializers import ValidationError
 from includes.validator import IS_NUMBERVALIDATOR, IS_EMAIL
 from django.core.validators import MinLengthValidator, EmailValidator
 
-## MODELOS ##
-from core_system.models import Comparendos, Sanciones, Personas, Infracciones
-
 
 class BasicProfileSerializer(serializers.Serializer):
     '''
@@ -25,28 +22,32 @@ class BasicProfileSerializer(serializers.Serializer):
         allow_null=False
     )
 
-    doc_type = serializers.CharField(
+    doc_type = serializers.ChoiceField(
         label='Tipo documento',
-        max_length=4,
+        choices=['CC','TI','CE','RC','NIP','NUIP','NIT','PA'],
         allow_blank=False,
-        allow_null=False
+        allow_null=False,
     )
 
-    person_type = serializers.CharField(
+    person_type = serializers.ChoiceField(
         label='Tipo persona',
-        max_length=16,
+        choices=['Persona natural', 'Persona jurídica'],
         allow_blank=False,
         allow_null=False
     )
 
     first_name = serializers.CharField(
         label='Nombres',
-        max_length=100
+        max_length=100,
+        allow_blank=True,
+        allow_null=True
     )
 
     last_name = serializers.CharField(
         label='Apellidos',
-        max_length=100
+        max_length=100,
+        allow_blank=True,
+        allow_null=True
     )
 
     email = serializers.CharField(
@@ -55,6 +56,8 @@ class BasicProfileSerializer(serializers.Serializer):
         validators=[
             EmailValidator()
         ],
+        allow_blank=True,
+        allow_null=True
     )
 
     mobile = serializers.CharField(
@@ -68,12 +71,6 @@ class BasicProfileSerializer(serializers.Serializer):
     update = serializers.BooleanField(
         label='¿Actualizar informacion?',
     )
-
-    def create(self, validated_data):
-        Personas.objects.get_or_create(validated_data)
-    
-    def update(self, validated_data):
-        update = self._kwargs['data'].get('update')
-        if update == 1: 
-            Personas.objects.update_or_create(validated_data)
-
+    recurrent_query = serializers.BooleanField(
+        label='¿Consulta recurrente?',
+    )

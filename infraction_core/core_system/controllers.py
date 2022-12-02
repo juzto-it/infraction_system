@@ -1,6 +1,7 @@
 from .profiles import Profile
 from .query_factory import QueryFactory
 import asyncio
+from .models import Personas
 
 
 
@@ -20,6 +21,7 @@ class InfractionController:
                 
                 self._query_api = QueryFactory.get_query_mode('Verifik')
                 results, err = asyncio.run(self._query_api.get_infractions(self._profile))
+                
                 self.__results_api = results['comparendos'] + results['resoluciones']
                 
                 return self.__results_api, err
@@ -30,13 +32,21 @@ class InfractionController:
             return self.__results_api, str(err)
         
     
-    def _save_infractions(self, customer: object):
+    def _save_infractions(self, customer: Personas):
         
+        result_api = None
+        result_rpa = None
         try:
-            if self._query_api:
-                pass
-            if self._query_rpa:
-                pass
-            
-        except Exception as _e:
-            print(_e)
+            if isinstance(customer, Personas):
+                
+                if self._query_api:
+                    result_api = self._query_api._save_infractions(customer)
+                    
+                if self._query_rpa:
+                    pass
+            else:
+                raise Exception('Param customer does not a person')
+            return result_api, result_rpa, None
+        except Exception as err:
+            print(err)
+            return result_api, result_rpa, str(err)

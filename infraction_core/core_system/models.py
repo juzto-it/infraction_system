@@ -3,7 +3,7 @@ from django.db import models
 
 ## CHOICES
 ESTADO = (
-    ('1','Comparendo'), ('2','Resolución'), ('3','Cobro'), ('4','Archivado')
+    ('1','Comparendo'), ('2','Resolución'), ('3','Cobro'), ('4','Archivado'), ('5', 'Inactivo')
 )
 
 SERVICIO_VEHICULO = (
