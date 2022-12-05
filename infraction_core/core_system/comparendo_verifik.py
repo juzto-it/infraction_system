@@ -1,5 +1,7 @@
 from .schemas import *
-from .models import Comparendos, Personas
+from .models import Comparendos, Personas, CodigosConsulta, Logs
+from .serializers.logs import LogsSerializer
+from datetime import datetime, date
 from django.core.exceptions import ObjectDoesNotExist
 from asgiref.sync import sync_to_async
 from utils.tools import IUtility
@@ -100,8 +102,13 @@ class ComparendoVerifik(IVerifik):
                                 }
                                 self.__comparendos_obj['comparendos'].append(_map)
                         else:
-                            pass
-                            # report log de respuesta inconsistente    
+                            log_data =  {
+                                'origen': self.__customer._origin,
+                                'destino': 'Verifik',
+                                'resultado': CodigosConsulta.objects.get(id_codigo=3),
+                                'fecha': datetime.now()
+                            }
+                            log_serializer = Logs.objects.create(**log_data)
                             
                     elif element['api'] == 'resoluciones':
                         
@@ -136,15 +143,29 @@ class ComparendoVerifik(IVerifik):
                                 }
                                 self.__comparendos_obj['resoluciones'].append(_map)
                         else:
-                            pass
+                            log_data =  {
+                                'origen': self.__customer._origin,
+                                'destino': 'Verifik',
+                                'resultado': CodigosConsulta.objects.get(id_codigo=3),
+                                'fecha': datetime.now()
+                            }
+                            log_serializer = Logs.objects.create(**log_data)
                           
                 except Exception as _e:
                     # report log de excepción en tranform data
-                    print(_e)        
+                    print(_e) 
+                    log_data =  {
+                        'origen': self.__customer._origin,
+                        'destino': 'Verifik',
+                        'resultado': 1,
+                        'fecha': datetime.now()
+                    }
+                    log_serializer = Logs.objects.create(**log_data)       
         
         except Exception as _e:
             # report log de excepción loop response data from verifik
-            pass
+            print(_e) 
+       
       
     async def __get_data(self, session: aiohttp.ClientSession, url: str, params: dict) -> dict:
         

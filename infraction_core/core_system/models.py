@@ -15,11 +15,11 @@ TIPO_VEHICULO = (
 )
 
 ORIGEN = (
-    ('1','CRM'), ('2','Juzto.co'), ('1','Webhook externo')
+    ('CRM','CRM'), ('Juzto.co','Juzto.co'), ('Webhook externo','Webhook externo')
 )
 
 DESTINO = (
-    ('1','Verifik'), ('2','Bot SIMIT'), ('3','Bot Bogotá'), ('4','Bot Medellín')
+    ('Verifik','Verifik'), ('Bot SIMIT','Bot SIMIT'), ('Bot Bogotá','Bot Bogotá'), ('Bot Medellín','Bot Medellín')
 )
 
 TIPO_PERSONA = (
@@ -203,7 +203,7 @@ class Infracciones(models.Model):
 
 class Logs(models.Model):
     id_log = models.OneToOneField(CodigosConsulta, models.DO_NOTHING, db_column='id_log', primary_key=True)
-    fecha = models.DateTimeField()
+    fecha = models.DateTimeField(auto_now_add=True)
     origen = models.CharField(max_length=15,choices=ORIGEN)
     destino = models.CharField(max_length=12,choices=DESTINO)
     usuario = models.ForeignKey('Personas', models.DO_NOTHING, db_column='usuario', blank=True, null=True)
@@ -218,8 +218,8 @@ class Logs(models.Model):
 class Personas(models.Model):
     id_persona = models.AutoField(primary_key=True)
     documento = models.CharField(max_length=20)
-    tipo_documento = models.CharField(max_length=4,choices=TIPO_DOCUMENTO)
-    tipo_persona = models.CharField(max_length=16,choices=TIPO_PERSONA)
+    tipo_documento = models.CharField(max_length=4,blank=True, null=True,choices=TIPO_DOCUMENTO)
+    tipo_persona = models.CharField(max_length=16,blank=True, null=True,choices=TIPO_PERSONA)
     nombres = models.CharField(max_length=100, blank=True, null=True)
     apellidos = models.CharField(max_length=100, blank=True, null=True)
     email = models.CharField(max_length=100, blank=True, null=True)

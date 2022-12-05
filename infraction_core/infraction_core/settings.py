@@ -19,6 +19,7 @@ ENV_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 env = environ.Env()
 env.read_env(os.path.join('../',ENV_DIR, '.env'))
+os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
 
 # Quick-start development settings - unsuitable for production
