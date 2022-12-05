@@ -8,6 +8,7 @@ from .profiles import Profile
 from .models import Tokens
 import aiohttp
 import asyncio
+import copy
 
 class ComparendoVerifik(IVerifik):
     
@@ -44,9 +45,9 @@ class ComparendoVerifik(IVerifik):
                     self.__transform_data(verifik_resp)
                 
                 return self.__comparendos_obj, None    
-        except Exception as _e:
-            print(_e)
-            return self.__comparendos_obj, str(_e)
+        except Exception as err:
+            print(err)
+            return self.__comparendos_obj, str(err)
                 
     def _save_infractions(self, customer: Personas) -> bool:
         try:
@@ -54,30 +55,39 @@ class ComparendoVerifik(IVerifik):
             if (isinstance(customer, Personas) and 
                 isinstance(self.__comparendos_obj, dict)):
                 
-                data_api = (self.__comparendos_obj.get('comparendos') + 
+                _data_tmp = (self.__comparendos_obj.get('comparendos') +
                             self.__comparendos_obj.get('resoluciones'))
                 
+                data_api = copy.deepcopy(_data_tmp)
+
                 ids_data_api = [id['id_comparendo'] for id in data_api]
                 data_bd = Comparendos.objects.filter(id_persona=customer.pk) 
                 
                 if len(data_bd) > 0:
                     data_bd.exclude(id_comparendo__in=ids_data_api).update(estado='Inactivo')
-                               
+                
+                              
                 for cmp in data_api:
+                    infraccion = IUtility.get_infraction(cmp.get('infraccion'),
+                                                         cmp.get('fecha_imposicion'))
                     cmp.update({'id_persona': customer})
-                    Comparendos.objects.update_or_create(id_comparendo=cmp.get('id_comparendo'),
+                    cmp.update({'infraccion': infraccion})
+                    
+                    if cmp.get('fotodeteccion') is None: cmp.pop('fotodeteccion')
+                    
+                    obj, updated = Comparendos.objects.update_or_create(id_comparendo=cmp.get('id_comparendo'),
                                                             defaults=cmp)
                 saved = True            
             else:
                 raise Exception('Error saving infractions. Customer or comparendos object does not an instance.')
                            
-        except Exception as _e:
+        except Exception as err:
             saved = False
-            print(_e)
+            print(err)
             # registrar en log la exepción
         return saved
     
-    def __transform_data(self, infractions):
+    def __transform_data(self, infractions: list):
         
         self.__comparendos_obj = {'comparendos': list(), 'resoluciones': list()}
 
