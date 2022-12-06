@@ -1,9 +1,8 @@
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
-from django.db import transaction
 
 ## MODELOS ##
-from core_system.models import Comparendos, Sanciones, Personas, Infracciones
+from core_system.models import Personas
 
 
 class PersonasSerializer(serializers.ModelSerializer):
@@ -12,7 +11,7 @@ class PersonasSerializer(serializers.ModelSerializer):
     '''
  
     documento = serializers.CharField(
-        label='Direccion',
+        label='Documento',
         max_length=20
     )
 
@@ -28,6 +27,8 @@ class PersonasSerializer(serializers.ModelSerializer):
 
     nombres = serializers.CharField(
         label='Nombres',
+        max_length=100,
+        allow_null=True,
         max_length=100,
         allow_blank=True,
         allow_null=True,
@@ -49,7 +50,8 @@ class PersonasSerializer(serializers.ModelSerializer):
 
     movil = serializers.CharField(
         label='Movil',
-        max_length=14
+        max_length=14,
+        allow_null=True
     )
 
     fecha_consulta_comp = serializers.DateTimeField(
@@ -70,15 +72,3 @@ class PersonasSerializer(serializers.ModelSerializer):
         fields = ('documento' , 'tipo_documento', 'tipo_persona', 'nombres', 'apellidos', 'email', 'movil', 'fecha_consulta_comp', 
         'consulta_recurrente')
 
-    def create(self, validated_data):
-        try:
-            with transaction.atomic():
-                personas_instance = Personas.objects.filter(tipo_documento=validated_data['tipo_documento'], documento=validated_data['documento']).first()
-                if personas_instance:
-                    return super().update(personas_instance,validated_data)
-                else:
-                    return super().create(validated_data)
-        except Exception as e:
-            raise serializers.ValidationError(e)
-
-        

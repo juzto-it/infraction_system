@@ -1,3 +1,6 @@
+from .models import Personas
+from utils.tools import IUtility
+
 
 class Profile:
       
@@ -7,11 +10,74 @@ class Profile:
         self._doc_number = doc_number
         self._doc_type = doc_type
         self._person_type = person_type
+        self._update = False
+        self._data_map = dict()
         
     def __str__(self) -> str:
         return self._doc_type + ' ' + self._doc_number
+    
+    def save(self, validated_data: dict):
+        
+        person = None
+        try:
+            #validated_data.pop('origin')
+            self.__map_object(validated_data)
+        
+            if validated_data.get('_update'):
+                person = self.__update(self._data_map)
+                return person
+            else:
+                person = self.__create(self._data_map)
+                return person
+            
+        except Exception as err: 
+            result = err
+        return person    
+        
+    def __create(self, c_data: dict):
+        
+        person, _ = Personas.objects.get_or_create(
+            documento=c_data.get('documento'), 
+            tipo_documento=c_data.get('tipo_documento'),
+            defaults=c_data)
+        
+        person.consulta_recurrente = c_data.get('consulta_recurrente')
+        person.save()
+        
+        return person
+    
+    def __update(self, u_data: dict):
+        
+        person, _ = Personas.objects.update_or_create(
+            documento=u_data.get('documento'), 
+            tipo_documento=u_data.get('tipo_documento'),
+            defaults=u_data)
+        return person
+    
+    def __map_object(self, validated_data: dict):
+        
+        
+        try:
+            
+            if isinstance(validated_data, dict):
+                self._data_map = {
+                   'documento': validated_data.get('_doc_number'),
+                   'tipo_documento': validated_data.get('_doc_type'),
+                   'tipo_persona': validated_data.get('_person_type'),
+                   'nombres': validated_data.get('_first_name'),
+                   'apellidos': validated_data.get('_last_name'),
+                   'email': validated_data.get('_email'),
+                   'movil': validated_data.get('_mobile'),
+                   'consulta_recurrente': validated_data.get('_recurring_query')
+                   }
+                return self._data_map
 
-
+            raise Exception('Validated data does not a dict')
+        
+        except Exception as err:
+            return err
+            
+            
 class BasicProfile(Profile):
       
     def __init__(self, origin: str, doc_number: str, doc_type: str, person_type: str,

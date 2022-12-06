@@ -4,6 +4,12 @@ from rest_framework.serializers import ValidationError
 ## MODELOS ##
 from core_system.models import Comparendos, Sanciones, Personas, Infracciones
 
+class InfraccionesSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Infracciones
+        fields = ['codigo']
+        
 
 class ComparendosSerializer(serializers.ModelSerializer):
     '''
@@ -89,6 +95,18 @@ class ComparendosSerializer(serializers.ModelSerializer):
         model = Comparendos
         fields = ('infraccion' , 'id_persona', 'fotodeteccion', 'estado', 'fecha_imposicion', 'fecha_resolucion', 'fecha_cobro_coactivo', 'numero_resolucion', 
         'numero_cobro_coactivo', 'placa', 'servicio_vehiculo', 'tipo_vehiculo', 'secretaria', 'direccion', 'valor_neto', 'valor_pago')
+ 
+            
+class ComparendosObjectSerializer(serializers.ModelSerializer):
+    '''
+    Serializador para la creación de Comparendos
+    '''
+
+    infraccion = InfraccionesSerializer()
+    
+    class Meta:
+        model = Comparendos
+        fields = '__all__'
 
 
 

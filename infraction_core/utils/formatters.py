@@ -17,7 +17,6 @@ class Formatter:
         except Exception as _e:
             return c_date
             
-    
     @staticmethod
     def clean_null_keys(exp: dict) -> dict:
         
@@ -25,7 +24,6 @@ class Formatter:
             return {k:v for k, v in exp.items() if v is not None}
         except:
             return None
-
 
     @staticmethod
     def datetime_utc_now():

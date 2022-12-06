@@ -1,7 +1,5 @@
 from .schemas import *
-from .models import Comparendos, Personas, CodigosConsulta, Logs
-from .serializers.logs import LogsSerializer
-from datetime import datetime, date
+from .models import Comparendos, Personas
 from django.core.exceptions import ObjectDoesNotExist
 from asgiref.sync import sync_to_async
 from utils.tools import IUtility
@@ -31,11 +29,13 @@ class ComparendoVerifik(IVerifik):
             if token is not None:
                 
                 hds = {'Authorization': token, 'Content-Type': 'application/json'} 
-                _data = {'documentNumber':self.__customer._doc_number, 'documentType': self.__customer._doc_type}
+                _data = {'documentNumber':self.__customer._doc_number, 
+                         'documentType': self.__customer._doc_type}
                 
                 async with aiohttp.ClientSession(headers=hds) as session:
                     for endpoint in self.__endpoints:
-                       actions.append(asyncio.ensure_future(self.__get_data(session, endpoint, _data)))
+                       actions.append(asyncio.ensure_future(
+                           self.__get_data(session, endpoint, _data)))
                        
                     response_data = await asyncio.gather(*actions)
                     for data in response_data:
@@ -47,9 +47,7 @@ class ComparendoVerifik(IVerifik):
         except Exception as _e:
             print(_e)
             return self.__comparendos_obj, str(_e)
-            
-        
-    
+                
     def _save_infractions(self, customer: Personas) -> bool:
         try:
             saved = False
@@ -88,8 +86,8 @@ class ComparendoVerifik(IVerifik):
                 try:
                     if element['api'] == 'comparendos':
                         
-                        
-                        val_schema = IUtility().schema_validator(schema_comparendos, element['d'])
+                        val_schema = IUtility().schema_validator(
+                            schema_comparendos, element['d'])
                         if val_schema:
                             if isinstance(element['d']['data']['comparendos'], list):
                                 comparendos = element['d']['data']['comparendos']
@@ -120,13 +118,8 @@ class ComparendoVerifik(IVerifik):
                                 }
                                 self.__comparendos_obj['comparendos'].append(_map)
                         else:
-                            log_data =  {
-                                'origen': self.__customer._origin,
-                                'destino': 'Verifik',
-                                'resultado': CodigosConsulta.objects.get(id_codigo=3),
-                                'fecha': datetime.now()
-                            }
-                            log_serializer = Logs.objects.create(**log_data)
+                            pass
+                            # report log de respuesta inconsistente    
                             
                     elif element['api'] == 'resoluciones':
                         
@@ -161,29 +154,16 @@ class ComparendoVerifik(IVerifik):
                                 }
                                 self.__comparendos_obj['resoluciones'].append(_map)
                         else:
-                            log_data =  {
-                                'origen': self.__customer._origin,
-                                'destino': 'Verifik',
-                                'resultado': CodigosConsulta.objects.get(id_codigo=3),
-                                'fecha': datetime.now()
-                            }
-                            log_serializer = Logs.objects.create(**log_data)
+                            pass
+                            # report log de respuesta inconsistente    
                           
                 except Exception as _e:
                     # report log de excepción en tranform data
-                    print(_e) 
-                    log_data =  {
-                        'origen': self.__customer._origin,
-                        'destino': 'Verifik',
-                        'resultado': 1,
-                        'fecha': datetime.now()
-                    }
-                    log_serializer = Logs.objects.create(**log_data)       
+                    print(_e)        
         
         except Exception as _e:
             # report log de excepción loop response data from verifik
-            print(_e) 
-       
+            pass
       
     async def __get_data(self, session: aiohttp.ClientSession, url: str, params: dict) -> dict:
         
@@ -202,16 +182,9 @@ class ComparendoVerifik(IVerifik):
         
         try:
             rs_token = await Tokens.objects.aget(id_token=1)    
-            return rs_token.token_key 
+            return rs_token.token_key
             
         except ObjectDoesNotExist as e:
             print(e)
-            log_data =  {
-                'origen': self.__customer._origin,
-                'destino': 'Verifik',
-                'resultado': 4,
-                'fecha': IUtility.datetime_utc_now
-            }
-            log_serializer = Logs.objects.acreate(**log_data)   
+            # Registar log de que el token no existe o no se puede recuperar
             return None
-                
