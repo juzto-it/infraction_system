@@ -208,6 +208,7 @@ class Logs(models.Model):
     destino = models.CharField(max_length=12,choices=DESTINO)
     usuario = models.ForeignKey('Personas', models.DO_NOTHING, db_column='usuario', blank=True, null=True)
     resultado = models.IntegerField()
+    detalle = models.CharField(max_length=300)
 
     class Meta:
         managed = False

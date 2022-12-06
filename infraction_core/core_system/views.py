@@ -6,6 +6,8 @@ from .profiles import BasicProfile
 from utils.tools import IUtility
 from .controllers import InfractionController
 from core_system.serializers.profiles import BasicProfileSerializer
+from core_system.serializers.personas import PersonasSerializer
+from core_system.models import *
 
 # Create your views here.
 
@@ -64,5 +66,14 @@ class Fotomultas(APIView):
             object_response['error'] = err if err else _except.args
             # log con la excepción presentada
             print(_except)
+            log_data =  {
+                'origen': _data['origin'],
+                'destino': 'Verifik',
+                'resultado': 1,
+                'fecha': IUtility.datetime_utc_now,
+                'detalle': err if err else _except.args
+            }
+
+            return Logs.objects.create(**log_data)
 
         return Response(status=status.HTTP_200_OK, data=object_response)

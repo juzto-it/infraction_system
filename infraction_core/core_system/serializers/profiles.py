@@ -38,13 +38,15 @@ class BasicProfileSerializer(serializers.Serializer):
 
     first_name = serializers.CharField(
         label='Nombres',
+        required=False,
         max_length=100,
         allow_blank=True,
-        allow_null=True
+        allow_null=True,
     )
 
     last_name = serializers.CharField(
         label='Apellidos',
+        required=False,
         max_length=100,
         allow_blank=True,
         allow_null=True
@@ -70,7 +72,13 @@ class BasicProfileSerializer(serializers.Serializer):
 
     update = serializers.BooleanField(
         label='¿Actualizar informacion?',
+        default=False,
+        required=False
+        
     )
+
     recurrent_query = serializers.BooleanField(
         label='¿Consulta recurrente?',
+        required=False,
+        default=False
     )

@@ -5,7 +5,7 @@ from asgiref.sync import sync_to_async
 from utils.tools import IUtility
 from .ifc_verifik import IVerifik
 from .profiles import Profile
-from .models import Tokens
+from .models import Tokens, Logs, Personas, Comparendos
 import aiohttp
 import asyncio
 
@@ -46,6 +46,14 @@ class ComparendoVerifik(IVerifik):
                 return self.__comparendos_obj, None    
         except Exception as _e:
             print(_e)
+            log_data =  {
+                'origen': self.__customer._origin,
+                'destino': 'Verifik',  
+                'resultado': 1,
+                'fecha': IUtility.datetime_utc_now,
+                'detalle': _e.args
+            }
+            Logs.objects.create(**log_data) 
             return self.__comparendos_obj, str(_e)
                 
     def _save_infractions(self, customer: Personas) -> bool:
@@ -75,6 +83,14 @@ class ComparendoVerifik(IVerifik):
             saved = False
             print(_e)
             # registrar en log la exepción
+            log_data =  {
+                'origen': self.__customer._origin,
+                'destino': 'Verifik',  
+                'resultado': 1,
+                'fecha': IUtility.datetime_utc_now,
+                'detalle': _e.args
+            }
+            return Logs.objects.create(**log_data) 
         return saved
     
     def __transform_data(self, infractions):
@@ -118,8 +134,14 @@ class ComparendoVerifik(IVerifik):
                                 }
                                 self.__comparendos_obj['comparendos'].append(_map)
                         else:
-                            pass
-                            # report log de respuesta inconsistente    
+                            log_data =  {
+                                'origen': self.__customer._origin,
+                                'destino': 'Verifik',  
+                                'resultado': 8,
+                                'fecha': IUtility.datetime_utc_now,
+                                'detalle': 'incistencia en datos'
+                            }
+                            return Logs.objects.create(**log_data)    
                             
                     elif element['api'] == 'resoluciones':
                         
@@ -154,16 +176,38 @@ class ComparendoVerifik(IVerifik):
                                 }
                                 self.__comparendos_obj['resoluciones'].append(_map)
                         else:
-                            pass
-                            # report log de respuesta inconsistente    
+                            # report log de respuesta inconsistente
+                            log_data =  {
+                                'origen': self.__customer._origin,
+                                'destino': 'Verifik',  
+                                'resultado': 8,
+                                'fecha': IUtility.datetime_utc_now,
+                                'detalle': 'incistencia en datos'
+                            }
+                            return Logs.objects.create(**log_data)  
                           
                 except Exception as _e:
-                    # report log de excepción en tranform data
-                    print(_e)        
+                    # report log de excepción en transform data
+                    log_data =  {
+                        'origen': self.__customer._origin,
+                        'destino': 'Verifik',
+                        'resultado': 7,
+                        'fecha': IUtility.datetime_utc_now,
+                        'detalle': _e.args
+                    }
+                    return Logs.objects.create(**log_data)
+       
         
         except Exception as _e:
             # report log de excepción loop response data from verifik
-            pass
+            log_data =  {
+                'origen': self.__customer._origin,
+                'destino': 'Verifik',
+                'resultado': 6,
+                'fecha': IUtility.datetime_utc_now,
+                'detalle': _e.args
+            }
+            return Logs.objects.create(**log_data)
       
     async def __get_data(self, session: aiohttp.ClientSession, url: str, params: dict) -> dict:
         
@@ -187,4 +231,11 @@ class ComparendoVerifik(IVerifik):
         except ObjectDoesNotExist as e:
             print(e)
             # Registar log de que el token no existe o no se puede recuperar
-            return None
+            log_data =  {
+                'origen': self.__customer._origin,
+                'destino': 'Verifik',
+                'resultado': 4,
+                'fecha': IUtility.datetime_utc_now,
+                'detalle': e.args
+            }
+            return Logs.objects.create(**log_data)
