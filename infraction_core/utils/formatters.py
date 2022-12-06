@@ -1,3 +1,5 @@
+from datetime import datetime
+import pytz
 class Formatter:
 
     @staticmethod
@@ -23,3 +25,12 @@ class Formatter:
             return {k:v for k, v in exp.items() if v is not None}
         except:
             return None
+
+
+    @staticmethod
+    def datetime_utc_now():
+        
+        time_zone = pytz.timezone('America/Bogota')
+        dt = datetime.now(time_zone)
+        dt = dt.strftime('%Y-%m-%d %H:%M:%S')
+        return str(dt)

@@ -50,16 +50,34 @@ class ComparendoVerifik(IVerifik):
             
         
     
-    def _save_infractions(self, customer: Personas) -> dict:
+    def _save_infractions(self, customer: Personas) -> bool:
         try:
-            person = Personas.objects.filter(documento='3333333', 
-                                             tipo_documento='CC')
-            
+            saved = False
+            if (isinstance(customer, Personas) and 
+                isinstance(self.__comparendos_obj, dict)):
                 
-            
+                data_api = (self.__comparendos_obj.get('comparendos') + 
+                            self.__comparendos_obj.get('resoluciones'))
+                
+                ids_data_api = [id['id_comparendo'] for id in data_api]
+                data_bd = Comparendos.objects.filter(id_persona=customer.pk) 
+                
+                if len(data_bd) > 0:
+                    data_bd.exclude(id_comparendo__in=ids_data_api).update(estado='Inactivo')
+                               
+                for cmp in data_api:
+                    cmp.update({'id_persona': customer})
+                    Comparendos.objects.update_or_create(id_comparendo=cmp.get('id_comparendo'),
+                                                            defaults=cmp)
+                saved = True            
+            else:
+                raise Exception('Error saving infractions. Customer or comparendos object does not an instance.')
+                           
         except Exception as _e:
+            saved = False
             print(_e)
-            return None
+            # registrar en log la exepción
+        return saved
     
     def __transform_data(self, infractions):
         
@@ -188,5 +206,12 @@ class ComparendoVerifik(IVerifik):
             
         except ObjectDoesNotExist as e:
             print(e)
+            log_data =  {
+                'origen': self.__customer._origin,
+                'destino': 'Verifik',
+                'resultado': 4,
+                'fecha': IUtility.datetime_utc_now
+            }
+            log_serializer = Logs.objects.acreate(**log_data)   
             return None
                 
