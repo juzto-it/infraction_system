@@ -11,17 +11,40 @@ import asyncio
 import copy
 
 class ComparendoVerifik(IVerifik):
-    
+    """
+    A concrete class that implements methods to fetch, 
+    transform and save the Verifik data.
+    Args:
+        IVerifik (Interface):   Class as interface with abstract methods
+                                fetch infrations.
+     Attributes:
+        origin (str):           Request source system or client.
+        endpoints (list):       Verifik endpoints.
+        customer (Profile):     Profile type associated with the }
+                                source of the query.
+        comparendos_obj (dict): A data structure to map data from Verifik.
+        
+    """
     def __init__(self) -> None:
         self.origin = None
         self.__endpoints = ['https://api.verifik.co/v2/co/simit/consultarComparendos', 
                            'https://api.verifik.co/v2/co/simit/consultarResoluciones']
-        self._infractions = list()
         self.__customer = None
         self.__comparendos_obj = {'comparendos': list(), 'resoluciones': list()}
         
     async def get_infractions(self, customer: Profile) -> dict:
-        
+        """
+        Function to fetch infractions from Verifik to two endpoints, 
+        consultarComparendos and consultarResoluciones.
+
+        Args:
+            customer (Profile): A profile with custer data. The mandatory 
+                                fields are doc_number and doc_type.
+
+        Returns:
+            dict:   A specific dictionary with saparate responses. 
+                    One for comparendos another for resoluciones.
+        """
         verifik_resp = list()
         actions = list()
         self.__customer = customer
@@ -41,7 +64,8 @@ class ComparendoVerifik(IVerifik):
                     response_data = await asyncio.gather(*actions)
                     for data in response_data:
                         verifik_resp.append(data)
-                        
+                    
+                    # Transforming the original Verifik data structure to own model    
                     self.__transform_data(verifik_resp)
                 
                 return self.__comparendos_obj, None    
@@ -50,6 +74,20 @@ class ComparendoVerifik(IVerifik):
             return self.__comparendos_obj, str(err)
                 
     def _save_infractions(self, customer: Personas) -> bool:
+        """
+        Function to save all the infractions fetched from Verifik endpoints.
+        This function collect the data and return if it was possible 
+        to save.
+        
+        Args:
+            customer (Personas): A existing person in database.
+
+        Raises:
+            Exception: When a error has ocurred saving the infractions.
+
+        Returns:
+            Boolean: True when all infractions has saved. 
+        """
         try:
             saved = False
             if (isinstance(customer, Personas) and 
@@ -75,8 +113,9 @@ class ComparendoVerifik(IVerifik):
                     
                     if cmp.get('fotodeteccion') is None: cmp.pop('fotodeteccion')
                     
-                    obj, updated = Comparendos.objects.update_or_create(id_comparendo=cmp.get('id_comparendo'),
-                                                            defaults=cmp)
+                    obj, created = Comparendos.objects.update_or_create(
+                        id_comparendo=cmp.get('id_comparendo'),
+                        defaults=cmp)
                 saved = True            
             else:
                 raise Exception('Error saving infractions. Customer or comparendos object does not an instance.')
@@ -88,7 +127,13 @@ class ComparendoVerifik(IVerifik):
         return saved
     
     def __transform_data(self, infractions: list):
-        
+        """
+        Funtion to map data structure from Verifik to Juzto structure.
+
+        Args:
+            infractions (list): A list with all infractions 
+                                previously obtained in the get violations method.
+        """
         self.__comparendos_obj = {'comparendos': list(), 'resoluciones': list()}
 
         try:
@@ -176,7 +221,17 @@ class ComparendoVerifik(IVerifik):
             pass
       
     async def __get_data(self, session: aiohttp.ClientSession, url: str, params: dict) -> dict:
-        
+        """
+        Async function to send the request to Verifik endpoints. This function asynchronously 
+        collects the data of the infractions.
+
+        Args:
+            session (aiohttp.ClientSession):    Object session to make a async request.
+            url (str):                          Endpoint to make a async request.
+            params (dict):                      Params with de doc_number and doc_type.
+        Returns:
+            dict:                               With the all data fetched from endpoints.
+        """
         api = None
         async with session.get(url=url, params=params) as resp:
             data = await resp.json()

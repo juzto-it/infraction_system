@@ -14,6 +14,20 @@ class Fotomultas(APIView):
     permission_classes = [IsAuthenticated]
     
     def post(self, request):
+        """
+        API function to fetch comparendos data from Verifik API and RPA projects.
+        This API works as core system to collect all the data from different sources.
+
+        Args:
+            request (POST): Json request has 
+
+        Raises:
+            Exception: [description]
+            Exception: [description]
+
+        Returns:
+            [type]: [description]
+        """
         _data = request.data
         
         object_response = {
@@ -24,9 +38,10 @@ class Fotomultas(APIView):
         err = None
         
         try:
-            
+            # A basic profile not demand all the data structure to fetch comparendos data
             profile_serializer = BasicProfileSerializer(data=_data)
             
+            # Validating if the imput data is correct
             if profile_serializer.is_valid():
                 
                 customer = BasicProfile(_data['origin'], _data['doc_number'], 
@@ -42,9 +57,12 @@ class Fotomultas(APIView):
                 person = customer.save(customer.__dict__)
                 
                 infractions = InfractionController(customer)
-                refresh_query = infractions._is_allowed_by_date(person)
                 
+                # Validating the cuote to renew comparendos data from the las datetime query 
+                refresh_query = infractions._is_allowed_by_date(person)
+                 
                 if refresh_query:
+                    # Fetching to the external API 
                     data_infractions, err = infractions._fetch_data_infractions()
                     _, _, err = infractions._save_infractions(person)
                     person.fecha_consulta_comp = IUtility().datetime_utc_now()
@@ -52,12 +70,14 @@ class Fotomultas(APIView):
                     if err:
                         raise Exception(err)
                 else:
+                    # Fetching to the own data base
                     data_infractions, err = infractions.get_infractions_from_db(person)
                     
                 object_response['data'] = data_infractions
                 object_response['status'] = 'success'
             else:
                 raise Exception (profile_serializer.errors)
+        
         except Exception as _except:
 
             object_response['status'] = 'error'

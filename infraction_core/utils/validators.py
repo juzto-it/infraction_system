@@ -10,7 +10,18 @@ class Validator:
     
     
     @staticmethod
-    def schema_validator(json_schema: dict, data: dict):
+    def schema_validator(json_schema: dict, data: dict) -> bool:
+        """
+        Function to validate a json schema from differents functions.
+        
+
+        Args:
+            json_schema (dict): A preconfigured schema.
+            data (dict):        A data structure to validate.
+
+        Returns:
+            Boolean: True if the input data complies with the structure. 
+        """
         try:
             validate(instance=data, schema=json_schema)
             return True
@@ -19,8 +30,20 @@ class Validator:
             return False
         
     @staticmethod
-    def get_infraction(inf_type: str, inf_date: str):
-        
+    def get_infraction(inf_type: str, inf_date: str) -> Infracciones:
+        """
+        Function to get or create a new infraction based in own system.
+
+        Args:
+            inf_type (str): Infraction type from the data source.
+            inf_date (str): Date from the data source.
+
+        Raises:
+            Exception: Exist a error based on data type.
+
+        Returns:
+            Infracciones: Infracciones object.
+        """
         invm = None
         invm_value = 0
         try:
@@ -53,14 +76,25 @@ class Validator:
             return None
     
     @staticmethod
-    def validate_query_time(query_date: datetime, date_time_now: str):
-        
+    def validate_query_time(query_date: datetime, date_time_now: str) -> bool:
+        """
+        Function to validate if the last customer query has exceeded 
+        the parameterized time to make a new query.
+
+        Args:
+            query_date (datetime): Last datetime query.
+            date_time_now (str):    Current datetime for a new query.
+
+        Returns:
+            Boolean: True if you can already perform a new query.
+        """
         default_days = 0
         try:
             if isinstance(query_date, datetime) and isinstance(date_time_now, str):
                 
                 current_datetime = datetime.strptime(date_time_now, '%Y-%m-%d %H:%M:%S')
-                person_datetime =  datetime.strptime(query_date.strftime('%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S')
+                person_datetime =  datetime.strptime(query_date.strftime('%Y-%m-%d %H:%M:%S'), 
+                                                     '%Y-%m-%d %H:%M:%S')
                 default_days = Parametrizaciones.objects.filter(clave='next_query_days').first()
                 
                 if (person_datetime + timedelta(days=int(default_days.valor))) > current_datetime:
