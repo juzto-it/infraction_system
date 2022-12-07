@@ -1,5 +1,4 @@
 from .schemas import *
-from .models import Comparendos, Personas
 from django.core.exceptions import ObjectDoesNotExist
 from asgiref.sync import sync_to_async
 from utils.tools import IUtility
