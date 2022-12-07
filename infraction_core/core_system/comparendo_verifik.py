@@ -5,14 +5,14 @@ from asgiref.sync import sync_to_async
 from utils.tools import IUtility
 from .ifc_verifik import IVerifik
 from .profiles import Profile
-from .models import Tokens
+from .models import Tokens, Logs, Personas, Comparendos
 import aiohttp
 import asyncio
 import copy
 
 class ComparendoVerifik(IVerifik):
     """
-    A concrete class that implements methods to fetch, 
+    A concrete class that implements methods to fetch,
     transform and save the Verifik data.
     Args:
         IVerifik (Interface):   Class as interface with abstract methods
@@ -23,7 +23,7 @@ class ComparendoVerifik(IVerifik):
         customer (Profile):     Profile type associated with the }
                                 source of the query.
         comparendos_obj (dict): A data structure to map data from Verifik.
-        
+
     """
     def __init__(self) -> None:
         self.origin = None
@@ -34,15 +34,15 @@ class ComparendoVerifik(IVerifik):
         
     async def get_infractions(self, customer: Profile) -> dict:
         """
-        Function to fetch infractions from Verifik to two endpoints, 
+        Function to fetch infractions from Verifik to two endpoints,
         consultarComparendos and consultarResoluciones.
 
         Args:
-            customer (Profile): A profile with custer data. The mandatory 
+            customer (Profile): A profile with custer data. The mandatory
                                 fields are doc_number and doc_type.
 
         Returns:
-            dict:   A specific dictionary with saparate responses. 
+            dict:   A specific dictionary with saparate responses.
                     One for comparendos another for resoluciones.
         """
         verifik_resp = list()
@@ -64,21 +64,28 @@ class ComparendoVerifik(IVerifik):
                     response_data = await asyncio.gather(*actions)
                     for data in response_data:
                         verifik_resp.append(data)
-                    
-                    # Transforming the original Verifik data structure to own model    
+                        
                     self.__transform_data(verifik_resp)
                 
                 return self.__comparendos_obj, None    
-        except Exception as err:
-            print(err)
-            return self.__comparendos_obj, str(err)
+        except Exception as _e:
+            print(_e)
+            log_data =  {
+                'origen': self.__customer._origin,
+                'destino': 'Verifik',
+                'resultado': 1,
+                'fecha': IUtility.datetime_utc_now,
+                'detalle': _e.args
+            }
+            Logs.objects.create(**log_data)
+            return self.__comparendos_obj, str(_e)
                 
     def _save_infractions(self, customer: Personas) -> bool:
         """
         Function to save all the infractions fetched from Verifik endpoints.
-        This function collect the data and return if it was possible 
+        This function collect the data and return if it was possible
         to save.
-        
+
         Args:
             customer (Personas): A existing person in database.
 
@@ -86,7 +93,7 @@ class ComparendoVerifik(IVerifik):
             Exception: When a error has ocurred saving the infractions.
 
         Returns:
-            Boolean: True when all infractions has saved. 
+            Boolean: True when all infractions has saved.
         """
         try:
             saved = False
@@ -120,10 +127,18 @@ class ComparendoVerifik(IVerifik):
             else:
                 raise Exception('Error saving infractions. Customer or comparendos object does not an instance.')
                            
-        except Exception as err:
+        except Exception as _e:
             saved = False
-            print(err)
+            print(_e)
             # registrar en log la exepción
+            log_data =  {
+                'origen': self.__customer._origin,
+                'destino': 'Verifik',
+                'resultado': 1,
+                'fecha': IUtility.datetime_utc_now,
+                'detalle': _e.args
+            }
+            return Logs.objects.create(**log_data)
         return saved
     
     def __transform_data(self, infractions: list):
@@ -131,7 +146,7 @@ class ComparendoVerifik(IVerifik):
         Funtion to map data structure from Verifik to Juzto structure.
 
         Args:
-            infractions (list): A list with all infractions 
+            infractions (list): A list with all infractions
                                 previously obtained in the get violations method.
         """
         self.__comparendos_obj = {'comparendos': list(), 'resoluciones': list()}
@@ -173,8 +188,14 @@ class ComparendoVerifik(IVerifik):
                                 }
                                 self.__comparendos_obj['comparendos'].append(_map)
                         else:
-                            pass
-                            # report log de respuesta inconsistente    
+                            log_data =  {
+                                'origen': self.__customer._origin,
+                                'destino': 'Verifik',
+                                'resultado': 8,
+                                'fecha': IUtility.datetime_utc_now,
+                                'detalle': 'incistencia en datos'
+                            }
+                            return Logs.objects.create(**log_data)
                             
                     elif element['api'] == 'resoluciones':
                         
@@ -209,20 +230,42 @@ class ComparendoVerifik(IVerifik):
                                 }
                                 self.__comparendos_obj['resoluciones'].append(_map)
                         else:
-                            pass
-                            # report log de respuesta inconsistente    
+                            # report log de respuesta inconsistente
+                            log_data =  {
+                                'origen': self.__customer._origin,
+                                'destino': 'Verifik',
+                                'resultado': 8,
+                                'fecha': IUtility.datetime_utc_now,
+                                'detalle': 'incistencia en datos'
+                            }
+                            return Logs.objects.create(**log_data)
                           
                 except Exception as _e:
-                    # report log de excepción en tranform data
-                    print(_e)        
+                    # report log de excepción en transform data
+                    log_data =  {
+                        'origen': self.__customer._origin,
+                        'destino': 'Verifik',
+                        'resultado': 7,
+                        'fecha': IUtility.datetime_utc_now,
+                        'detalle': _e.args
+                    }
+                    return Logs.objects.create(**log_data)
+
         
         except Exception as _e:
             # report log de excepción loop response data from verifik
-            pass
+            log_data =  {
+                'origen': self.__customer._origin,
+                'destino': 'Verifik',
+                'resultado': 6,
+                'fecha': IUtility.datetime_utc_now,
+                'detalle': _e.args
+            }
+            return Logs.objects.create(**log_data)
       
     async def __get_data(self, session: aiohttp.ClientSession, url: str, params: dict) -> dict:
         """
-        Async function to send the request to Verifik endpoints. This function asynchronously 
+        Async function to send the request to Verifik endpoints. This function asynchronously
         collects the data of the infractions.
 
         Args:
@@ -252,5 +295,11 @@ class ComparendoVerifik(IVerifik):
         except ObjectDoesNotExist as e:
             print(e)
             # Registar log de que el token no existe o no se puede recuperar
-            return None
-                
+            log_data =  {
+                'origen': self.__customer._origin,
+                'destino': 'Verifik',
+                'resultado': 4,
+                'fecha': IUtility.datetime_utc_now,
+                'detalle': e.args
+            }
+            return Logs.objects.create(**log_data)

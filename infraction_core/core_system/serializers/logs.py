@@ -6,7 +6,7 @@ from django.db import transaction
 from core_system.models import Logs, Comparendos, Sanciones, Personas, Infracciones
 
 
-class PersonasSerializer(serializers.ModelSerializer):
+class LogsSerializer(serializers.ModelSerializer):
     '''
     Serializador para la creación de Logs
     '''
@@ -31,7 +31,9 @@ class PersonasSerializer(serializers.ModelSerializer):
 
     usuario = serializers.PrimaryKeyRelatedField(
         label='Usuario', 
-        queryset=Personas.objects.all()
+        queryset=Personas.objects.all(),
+        allow_null=True,
+        required=False
     )
 
     resultados = serializers.BooleanField(

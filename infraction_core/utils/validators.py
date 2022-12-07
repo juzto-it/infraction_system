@@ -26,7 +26,6 @@ class Validator:
             validate(instance=data, schema=json_schema)
             return True
         except jsonschema.exceptions.ValidationError as err:
-            print(err)
             return False
         
     @staticmethod
