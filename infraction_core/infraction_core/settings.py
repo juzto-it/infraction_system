@@ -31,7 +31,7 @@ SECRET_KEY = 'django-insecure-6)rnk43*oy*q9qnog$419sj=5zfj4c&d+jhjhf)*6*r6n1p(%9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['iy8s24up4d.execute-api.us-east-1.amazonaws.com']
+ALLOWED_HOSTS = ['*','iy8s24up4d.execute-api.us-east-1.amazonaws.com']
 
 
 # Application definition
