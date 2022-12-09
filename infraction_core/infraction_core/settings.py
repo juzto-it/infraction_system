@@ -31,7 +31,7 @@ SECRET_KEY = 'django-insecure-6)rnk43*oy*q9qnog$419sj=5zfj4c&d+jhjhf)*6*r6n1p(%9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['iy8s24up4d.execute-api.us-east-1.amazonaws.com']
 
 
 # Application definition
@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'core_system',
     'utils',
+    'django_s3_storage',
 ]
 
 
@@ -91,8 +92,19 @@ TEMPLATES = [
 WSGI_APPLICATION = 'infraction_core.wsgi.application'
 
 
+S3_BUCKET = "zappa-jwdev8zmj"
+
+STATICFILES_STORAGE = "django_s3_storage.storage.StaticS3Storage"
+
+AWS_S3_BUCKET_NAME_STATIC = S3_BUCKET
+
+STATIC_URL = "https://%s.s3.amazonaws.com/" % S3_BUCKET
+
+
+
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
+
 
 DATABASES = {
     'default': {
@@ -144,12 +156,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.1/howto/static-files/
-
-STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
