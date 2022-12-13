@@ -6,11 +6,11 @@ import MySQLdb
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 
-rds_host = 'comparendos.ccwsv3fmimn3.us-east-1.rds.amazonaws.com'
-db_name = 'comparendosDB'
-user_name = 'admindb'  
-password = 'Abc123456$'
-port = 3306
+rds_host = settings.env('DB_SERVER')
+db_name = settings.env('DB_SCHEMA')
+user_name = settings.env('DB_USER')
+password = settings.env('DB_PASS')
+port = settings.env('DB_PORT')
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)

@@ -194,7 +194,7 @@ class ComparendoVerifik(IVerifik):
                                 'fecha': IUtility.datetime_utc_now,
                                 'detalle': 'incistencia en datos'
                             }
-                            return Logs.objects.create(**log_data)
+                            Logs.objects.create(**log_data)
                             
                     elif element['api'] == 'resoluciones':
                         
@@ -237,7 +237,7 @@ class ComparendoVerifik(IVerifik):
                                 'fecha': IUtility.datetime_utc_now,
                                 'detalle': 'incistencia en datos'
                             }
-                            return Logs.objects.create(**log_data)
+                            Logs.objects.create(**log_data)
                           
                 except Exception as _e:
                     # report log de excepción en transform data
