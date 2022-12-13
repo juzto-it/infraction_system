@@ -7,7 +7,7 @@
         "runtime": "python3.9",
         "s3_bucket": "zappa-jwdev8zmj",
         "vpc_config" : {
-            "SubnetIds": [ "subnet-bab49284", "subnet-53ea3e5d", "subnet-e0f9e6bc", "subnet-32617355", "subnet-9c8c95b2", "subnet-564fed1b" ], 
+            "SubnetIds": [ "subnet-04e1ed9516fc58ec8" ], 
             "SecurityGroupIds": [ "sg-09609e1b0e924a5a5" ]
         }
     }
