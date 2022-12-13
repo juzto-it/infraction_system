@@ -16,6 +16,7 @@ gunicorn = "==20.0.4"
 aiohttp = "*"
 pymysql = "*"
 pyyaml = "*"
+pandas = "*"
 
 [dev-packages]
 autopep8 = "*"

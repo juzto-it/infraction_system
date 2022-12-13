@@ -1,3 +1,4 @@
+from django.core.files.storage import FileSystemStorage
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -8,6 +9,7 @@ from .controllers import InfractionController
 from core_system.serializers.profiles import BasicProfileSerializer
 from core_system.serializers.personas import PersonasSerializer
 from core_system.models import *
+import pandas as pd
 
 # Create your views here.
 
@@ -97,3 +99,15 @@ class Fotomultas(APIView):
             return Logs.objects.create(**log_data)
 
         return Response(status=status.HTTP_200_OK, data=object_response)
+
+class MultasTuio(APIView):
+    
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        fs_object = FileSystemStorage()
+        df_placas = pd.read_excel()
+        file_path_p = fs_object.base_location + 'Base de Datos JUZTO.xlsx'
+        
+        Response(status=status.HTTP_200_OK, data={'object': 'finalizado'}) 
+        
