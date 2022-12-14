@@ -17,6 +17,7 @@ aiohttp = "*"
 pymysql = "*"
 pyyaml = "*"
 pandas = "*"
+openpyxl = "*"
 
 [dev-packages]
 autopep8 = "*"
