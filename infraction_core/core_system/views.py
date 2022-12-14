@@ -142,8 +142,8 @@ class MultasTuio(APIView):
         file_path_p = fs_object.base_location + '/Base de Datos JUZTO.xlsx'
         df_placas = pd.read_excel(file_path_p, sheet_name='Hoja1', 
                                   usecols=['Placa'])
-        hds = {'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJjbGllbnRJZCI6IjYxNjlmMmE3ZmU0ZjY2M2MyZmZkMDZmNCIsImRvY3VtZW50VHlwZSI6Ik5JVCIsImRvY3VtZW50TnVtYmVyIjoiOTAxMzUwNjI4LTQiLCJ2IjoxLCJyb2xlIjoiY2xpZW50Iiwic3Vic2NyaXB0aW9uUGxhbiI6IjYxNjlmMmE4NDhmOGI5N2QzZDliZGIxZCIsIkpXVFBocmFzZSI6ImFwcjI1IiwiaWF0IjoxNjU4MTcxMTA5fQ.hLzhjs_dtwR8o2J6CVHyvat9c1gqZfkgK7NqRkRmJXU' , 
-               'Content-Type': 'application/json'}
+        token = Tokens.objects.aget(id_token=1)
+        hds = {'Authorization': token.token_key, 'Content-Type': 'application/json'}
         
         IUtility.format_date('04/11/2022')
         print(df_placas)
