@@ -12,17 +12,20 @@ class PersonasSerializer(serializers.ModelSerializer):
  
     documento = serializers.CharField(
         label='Documento',
-        max_length=20
+        max_length=20,
+        required = True
     )
 
     tipo_documento = serializers.CharField(
         label='Tipo documento',
-        max_length=4
+        max_length=4,
+        required = True
     )
 
     tipo_persona = serializers.CharField(
         label='Tipo persona',
-        max_length=16
+        max_length=16,
+        required = True
     )
 
     nombres = serializers.CharField(
