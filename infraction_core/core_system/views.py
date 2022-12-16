@@ -90,7 +90,7 @@ class Fotomultas(APIView):
                 'origen': _data['origin'],
                 'destino': 'Verifik',
                 'resultado': 1,
-                'fecha': IUtility.datetime_utc_now,
+                'fecha': IUtility.datetime_utc_now(),
                 'detalle': err if err else _except.args
             }
 
