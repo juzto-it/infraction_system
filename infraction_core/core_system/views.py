@@ -94,6 +94,6 @@ class Fotomultas(APIView):
                 'detalle': err if err else _except.args
             }
 
-            return Logs.objects.create(**log_data)
+            Logs.objects.create(**log_data)
 
         return Response(status=status.HTTP_200_OK, data=object_response)
