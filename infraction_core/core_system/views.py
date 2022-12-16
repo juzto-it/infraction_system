@@ -93,7 +93,8 @@ class Fotomultas(APIView):
                 'fecha': IUtility.datetime_utc_now,
                 'detalle': err if err else _except.args
             }
-
-            return Logs.objects.create(**log_data)
+            Logs.objects.create(**log_data)
+            object_response['data'] = _except.args
+            object_response['status'] = 'HTTP_500_INTERNAL_SERVER_ERROR'
 
         return Response(status=status.HTTP_200_OK, data=object_response)
