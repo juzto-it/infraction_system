@@ -29,8 +29,9 @@ class BasicProfileSerializer(serializers.Serializer):
 
     person_type = serializers.ChoiceField(
         label='Tipo persona',
-        required = True,
-        choices = TIPO_PERSONA
+        choices = TIPO_PERSONA,
+        allow_blank=True,
+        allow_null=True,
     )
 
     first_name = serializers.CharField(

@@ -46,9 +46,9 @@ class Fotomultas(APIView):
             # Validating if the imput data is correct
             if profile_serializer.is_valid():
                 
-                customer = BasicProfile(_data['origin'], _data['doc_number'], 
-                                        _data['doc_type'], _data['person_type'])
+                customer = BasicProfile(_data['origin'], _data['doc_number'], _data['doc_type'])
                 
+                if _data['person_type']: customer._person_type = _data['person_type']
                 if _data['first_name']: customer._first_name = _data['first_name']
                 if _data['last_name']: customer._last_name = _data['last_name']
                 if _data['email']: customer._email = _data['email']
@@ -90,11 +90,12 @@ class Fotomultas(APIView):
                 'origen': _data['origin'],
                 'destino': 'Verifik',
                 'resultado': 1,
-                'fecha': IUtility.datetime_utc_now,
+                'fecha': IUtility.datetime_utc_now(),
                 'detalle': err if err else _except.args
             }
+
             Logs.objects.create(**log_data)
-            object_response['data'] = _except.args
-            object_response['status'] = 'HTTP_500_INTERNAL_SERVER_ERROR'
+            object_response['data']  = _except.args
+            object_response['status'] = status.HTTP_500_INTERNAL_SERVER_ERROR
 
         return Response(status=status.HTTP_200_OK, data=object_response)

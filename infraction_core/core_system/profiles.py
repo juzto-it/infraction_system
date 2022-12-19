@@ -12,7 +12,6 @@ class Profile:
         origin (str):       Request source system or client.
         doc_number (str):   Customer doc number.
         doc_type (str):     Customer doc type. Official doc types.
-        person:type (str):  Customer person type (Natural, Jurídica).
 
     Attributes:
         origin (str):       Request source system or client.
@@ -25,13 +24,11 @@ class Profile:
                             object.
     
     """
-    def __init__(self, origin: str, doc_number: str, doc_type: str, 
-                 person_type: str) -> None:
+    def __init__(self, origin: str, doc_number: str, doc_type: str) -> None:
         
         self._origin = origin
         self._doc_number = doc_number
         self._doc_type = doc_type
-        self._person_type = person_type
         self._update = False
         self._data_map = dict()
         
@@ -159,13 +156,12 @@ class BasicProfile(Profile):
                                     to fetch infractions.
 
     """      
-    def __init__(self, origin: str, doc_number: str, doc_type: str, person_type: str,
+    def __init__(self, origin: str, doc_number: str, doc_type: str, person_type: str=None,
                  first_name: str=None, last_name: str=None, email: str=None, 
                  mobile: str=None, recurring_query: bool=False) -> None:
         
-        super().__init__(origin=origin, doc_number=doc_number, doc_type=doc_type, 
-                         person_type=person_type)
-        
+        super().__init__(origin=origin, doc_number=doc_number, doc_type=doc_type)
+        self._person_type = person_type
         self._first_name = first_name
         self._last_name = last_name
         self._email = email
@@ -206,7 +202,7 @@ class JuztoProfile(Profile):
         
         super().__init__(origin=origin, doc_number=doc_number, doc_type=doc_type, 
                          person_type=person_type)
-
+        self._person_type = person_type
         self._first_name = first_name
         self._last_name = last_name
         self._email = email
