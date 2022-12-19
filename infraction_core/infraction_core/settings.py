@@ -26,10 +26,10 @@ os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-6)rnk43*oy*q9qnog$419sj=5zfj4c&d+jhjhf)*6*r6n1p(%9'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env('DEBUG')
+DEBUG = os.environ.get('DEBUG')
 
 ALLOWED_HOSTS = ['*','iy8s24up4d.execute-api.us-east-1.amazonaws.com']
 
@@ -109,11 +109,11 @@ STATIC_URL = "https://%s.s3.amazonaws.com/" % S3_BUCKET
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': env('DB_SCHEMA'),
-        'USER': env('DB_USER'),
-        'PASSWORD': env('DB_PASS'),
-        'HOST': env('DB_SERVER'),
-        'PORT': env('DB_PORT'),
+        'NAME': os.environ.get('DB_SCHEMA'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASS'),
+        'HOST': os.environ.get('DB_SERVER'),
+        'PORT': os.environ.get('DB_PORT'),
     }
 }
 
@@ -137,7 +137,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "https://juzto.co",
+
     "https://www.juzto.co",
 ]
 
