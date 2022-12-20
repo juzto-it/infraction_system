@@ -66,6 +66,8 @@ class BasicProfileSerializer(serializers.Serializer):
             IS_NUMBERVALIDATOR,
             MinLengthValidator(7)
         ],
+        allow_blank=True,
+        allow_null=True
     )
 
     update = serializers.BooleanField(
