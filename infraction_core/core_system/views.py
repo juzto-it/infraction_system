@@ -95,7 +95,7 @@ class Fotomultas(APIView):
             }
 
             Logs.objects.create(**log_data)
-            object_response['data']  = _except.args
+            
             object_response['status'] = status.HTTP_500_INTERNAL_SERVER_ERROR
 
         return Response(status=status.HTTP_200_OK, data=object_response)
