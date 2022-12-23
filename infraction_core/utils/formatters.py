@@ -60,3 +60,21 @@ class Formatter:
         dt = datetime.now(time_zone)
         dt = dt.strftime('%Y-%m-%d %H:%M:%S')
         return str(dt)
+    
+    @staticmethod
+    def format_date(c_date: str) -> str:
+        try:
+            if c_date is not None:
+                
+                if ' ' in c_date:
+                    dt_date = datetime.strptime(c_date, '%d/%m/%Y %H:%M:%S')
+                    dt_date = dt_date.strftime('%Y-%m-%d %H:%M:%S')
+                    return str(dt_date)
+                else:
+                    dt_date = datetime.strptime(c_date, '%d/%m/%Y')
+                    dt_date = dt_date.strftime('%Y-%m-%d')
+                    return str(dt_date)
+            return None
+        except Exception as err:
+            print(err)
+            return None
