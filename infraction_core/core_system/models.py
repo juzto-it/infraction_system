@@ -272,3 +272,47 @@ class Parametrizaciones(models.Model):
     class Meta:
         managed = False
         db_table = 'parametrizaciones'
+
+
+class Multas(models.Model):
+    id_comparendo = models.CharField(primary_key=True, max_length=25)
+    fecha_consulta = models.DateTimeField(blank=True, null=True)
+    placa = models.CharField(max_length=10, blank=True, null=True)
+    documento = models.CharField(max_length=15, blank=True, null=True)
+    estado_comparendo = models.CharField(max_length=45, blank=True, null=True)
+    comparendo_electronico = models.IntegerField(blank=True, null=True)
+    fecha_comparendo = models.DateTimeField(blank=True, null=True)
+    tipo_infraccion = models.CharField(max_length=5, blank=True, null=True)
+    ciudad_infraccion = models.CharField(max_length=50, blank=True, null=True)
+    tiene_resolucion = models.CharField(max_length=45, blank=True, null=True)
+    fecha_resolucion = models.DateTimeField(blank=True, null=True)
+    tiene_cobro_coactivo = models.CharField(max_length=45, blank=True, null=True)
+    fecha_cobro_coactivo = models.DateTimeField(blank=True, null=True)
+    valor_infraccion = models.FloatField(blank=True, null=True)
+    fecha_notificacion = models.DateTimeField(blank=True, null=True)
+    valor_notificacion = models.FloatField(blank=True, null=True)
+    dias_notificacion = models.IntegerField(blank=True, null=True)
+    fecha_descuento_50 = models.DateTimeField(blank=True, null=True)
+    valor_descuento_50 = models.FloatField(blank=True, null=True)
+    dias_descuento_50 = models.IntegerField(blank=True, null=True)
+    fecha_descuento_25 = models.DateTimeField(blank=True, null=True)
+    valor_descuento_25 = models.FloatField(blank=True, null=True)
+    dias_descuento_25 = models.IntegerField(blank=True, null=True)
+    fecha_sin_intereses = models.DateTimeField(blank=True, null=True)
+    valor_sin_intereses = models.FloatField(blank=True, null=True)
+    dias_sin_intereses = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'multas'
+
+
+class LogMultas(models.Model):
+    placa = models.CharField(max_length=10)
+    fecha_consulta = models.DateTimeField()
+    resultado = models.CharField(max_length=7, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'log_multas'
+

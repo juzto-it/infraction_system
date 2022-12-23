@@ -16,10 +16,13 @@ gunicorn = "==20.0.4"
 aiohttp = "*"
 pymysql = "*"
 pyyaml = "*"
+pandas = "*"
+openpyxl = "*"
 zappa = "*"
 botocore = "*"
 cryptography = "==2.8"
 aws-psycopg2 = "*"
+
 
 [dev-packages]
 autopep8 = "*"
