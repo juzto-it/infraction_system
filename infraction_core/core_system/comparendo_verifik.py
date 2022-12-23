@@ -234,8 +234,8 @@ class ComparendoVerifik(IVerifik):
                                 'origen': self.__customer._origin,
                                 'destino': 'Verifik',
                                 'resultado': 8,
-                                'fecha': IUtility.datetime_utc_now,
-                                'detalle': 'incistencia en datos'
+                                'fecha': IUtility.datetime_utc_now(),
+                                'detalle': 'inconsistencia en datos'
                             }
                             Logs.objects.create(**log_data)
                           
@@ -245,10 +245,10 @@ class ComparendoVerifik(IVerifik):
                         'origen': self.__customer._origin,
                         'destino': 'Verifik',
                         'resultado': 7,
-                        'fecha': IUtility.datetime_utc_now,
+                        'fecha': IUtility.datetime_utc_now(),
                         'detalle': _e.args
                     }
-                    return Logs.objects.create(**log_data)
+                    Logs.objects.create(**log_data)
 
         
         except Exception as _e:
@@ -257,7 +257,7 @@ class ComparendoVerifik(IVerifik):
                 'origen': self.__customer._origin,
                 'destino': 'Verifik',
                 'resultado': 6,
-                'fecha': IUtility.datetime_utc_now,
+                'fecha': IUtility.datetime_utc_now(),
                 'detalle': _e.args
             }
             return Logs.objects.create(**log_data)
@@ -298,7 +298,7 @@ class ComparendoVerifik(IVerifik):
                 'origen': self.__customer._origin,
                 'destino': 'Verifik',
                 'resultado': 4,
-                'fecha': IUtility.datetime_utc_now,
+                'fecha': IUtility.datetime_utc_now(),
                 'detalle': e.args
             }
             return Logs.objects.create(**log_data)

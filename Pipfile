@@ -18,6 +18,11 @@ pymysql = "*"
 pyyaml = "*"
 pandas = "*"
 openpyxl = "*"
+zappa = "*"
+botocore = "*"
+cryptography = "==2.8"
+aws-psycopg2 = "*"
+
 
 [dev-packages]
 autopep8 = "*"

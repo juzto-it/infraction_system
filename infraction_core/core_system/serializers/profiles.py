@@ -2,38 +2,36 @@ from rest_framework import serializers
 from rest_framework.serializers import ValidationError
 from includes.validator import IS_NUMBERVALIDATOR, IS_EMAIL
 from django.core.validators import MinLengthValidator, EmailValidator
+from core_system.models import *
 
 
 class BasicProfileSerializer(serializers.Serializer):
     '''
     Serializador profiles
     '''
-    origin = serializers.CharField(
+    origin = serializers.ChoiceField(
         label='Origen',
-        max_length=20,
-        allow_blank=False,
-        allow_null=False
+        required = True,
+        choices = ORIGEN
     )
 
     doc_number = serializers.CharField(
         label='Documento',
         max_length=20,
-        allow_blank=False,
-        allow_null=False
+        required = True
     )
 
-    doc_type = serializers.CharField(
+    doc_type = serializers.ChoiceField(
         label='Tipo documento',
-        max_length=4,
-        allow_blank=False,
-        allow_null=False
+        required = True,
+        choices = TIPO_DOCUMENTO
     )
 
-    person_type = serializers.CharField(
+    person_type = serializers.ChoiceField(
         label='Tipo persona',
-        max_length=16,
-        allow_blank=False,
-        allow_null=False
+        choices = TIPO_PERSONA,
+        allow_blank=True,
+        allow_null=True,
     )
 
     first_name = serializers.CharField(
@@ -68,6 +66,8 @@ class BasicProfileSerializer(serializers.Serializer):
             IS_NUMBERVALIDATOR,
             MinLengthValidator(7)
         ],
+        allow_blank=True,
+        allow_null=True
     )
 
     update = serializers.BooleanField(
