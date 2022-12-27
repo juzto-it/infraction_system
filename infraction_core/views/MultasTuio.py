@@ -21,8 +21,7 @@ class MultasTuio(APIView):
     permission_classes = [IsAuthenticated]
     
     def post(self, request):
-        get_data = False
-        
+        get_data = False    
         csv_file = request.FILES.get('file')
         try:
             csv_file.content_type

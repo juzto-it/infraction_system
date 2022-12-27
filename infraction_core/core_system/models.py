@@ -276,6 +276,7 @@ class Parametrizaciones(models.Model):
 
 class Multas(models.Model):
     id_comparendo = models.CharField(primary_key=True, max_length=25)
+    primer_fecha_consulta = models.DateTimeField(auto_now=True,blank=True, null=True)
     fecha_consulta = models.DateTimeField(blank=True, null=True)
     placa = models.CharField(max_length=10, blank=True, null=True)
     documento = models.CharField(max_length=15, blank=True, null=True)
